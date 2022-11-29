@@ -65,53 +65,53 @@ class Script {
         message_text += " created a checklist item";
       }
 
-      attachment_text = "\nItem: " + request.content.action.data.checkItem.name;
-      attachment_text += "\nChecklist: " + request.content.action.data.checklist.name;
-      attachment_text += "\nCard: " + card_name;
+      attachment_text = `\nItem: ${request.content.action.data.checkItem.name}`;
+      attachment_text += `\nChecklist: ${request.content.action.data.checklist.name}`;
+      attachment_text += `\nCard: ${card_name}`;
     }
     /** If a check list is added to a card */
     else if (request.content.action.type == "addChecklistToCard") {
       message_text += " added a checklist to card";
-      attachment_text += "\nChecklist: " + request.content.action.data.checklist.name;
-      attachment_text += "\nCard: " + card_name;
+      attachment_text += `\nChecklist: ${request.content.action.data.checklist.name}`;
+      attachment_text += `\nCard: ${card_name}`;
 
     }
     /** If a checklist is removed from a card */
     else if (request.content.action.type == "removeChecklistFromCard") {
       message_text += " removed a checklist from card";
-      attachment_text += "\nChecklist: " + request.content.action.data.checklist.name;
-      attachment_text += "\nCard: " + card_name;
+      attachment_text += `\nChecklist: ${request.content.action.data.checklist.name}`;
+      attachment_text += `\nCard: ${card_name}`;
     }
     /** If a card is created */
     else if (request.content.action.type == "createCard") {
       var list_name = request.content.action.data.list.name;
-      message_text = " New card [" + card_name + "](https://trello.com/c/" + card_link + ") added to list [" + list_name + "](https://trello.com/b/" + board_link + ")"
-      url = "https://trello.com/c/" + request.content.action.data.card.shortLink;
+      message_text = ` New card [${card_name}](https://trello.com/c/${card_link}) added to list [${list_name}](https://trello.com/b/${board_link})`
+      url = `https://trello.com/c/${request.content.action.data.card.shortLink}`;
     }
     /** If a card is deleted */
     else if (request.content.action.type == "deleteCard") {
       var list_name = request.content.action.data.list.name;
-      message_text = "Card [#" + request.content.action.data.card.idShort + "](https://trello.com/c/" + card_link + ") deleted from list [" + list_name + "](https://trello.com/b/" + board_link + ")"
-      url = "https://trello.com/c/" + request.content.action.data.card.shortLink;
+      message_text = `Card [#${request.content.action.data.card.idShort}](https://trello.com/c/${card_link}) deleted from list [${list_name}](https://trello.com/b/${board_link})`
+      url = `https://trello.com/c/${request.content.action.data.card.shortLink}`;
     }
     /** If a card is updated */
     else if (request.content.action.type == "updateCard") {
       var data = request.content.action.data;
       if (data.listBefore) {//moveCardToList
-        message_text = 'Card moved: "[' + card_name + '](https://trello.com/c/' + card_link + ')" from list "' + data.listBefore.name + "' to '" + data.listAfter.name + "'";
+        message_text = `Card moved: "[${card_name}](https://trello.com/c/${card_link})" from list "${data.listBefore.name}' to '${data.listAfter.name}'`;
       }
       else if (data.old.name) {//renameCard
         var card_old_name = data.old.name;
-        message_text = 'Card renamed from "' + card_old_name + '" to "[' + card_name + '](https://trello.com/c/' + card_link + ')"';
+        message_text = `[Card](https://trello.com/c/ ${card_link}) renamed from "${card_old_name}" to "${card_name}"`;
       }
 
       else if (data.old.desc != data.card.desc) {//renameCardDesc
         var card_desc = data.card.desc;
         var old_desc = data.old.desc;
         if (old_desc != "") {
-          card_desc = 'from "' + old_desc + '" to "' + card_desc + '"';
+          card_desc = `from "${old_desc}" to "${card_desc}"`;
         }
-        message_text = 'Card updated: "[' + card_name + '](https://trello.com/c/' + card_link + ')"\n**Description**: ' + card_desc + '';
+        message_text = `Card updated: "[${card_name}](https://trello.com/c/${card_link})"\n**Description**: ${card_desc}`;
       }
       else if (data.card.due != data.old.due) {//updateCardDueDate
         var card_due = data.card.due;
@@ -120,42 +120,42 @@ class Script {
         if (due_action == null)
           due_action = 'Removed';//removeCardDueDate
 
-        message_text = 'Card updated: "[' + card_name + '](https://trello.com/c/' + card_link + ')"\n**Due Date**: ' + due_action + ''
+        message_text = `Card updated: "[${card_name}](https://trello.com/c/${card_link})"\n**Due Date**: ${due_action}`
       }
       else if (data.card.closed == true) {//archiveCard
-        message_text = 'Card archived: "[' + card_name + '](https://trello.com/c/' + card_link + ')"'
+        message_text = `Card archived: "[${card_name}](https://trello.com/c/${card_link})"`
       }
 
       else if (data.card.closed == false) {//unarchiveCard
-        message_text = 'Card unarchived: "[' + card_name + '](https://trello.com/c/' + card_link + ')"'
+        message_text = `Card unarchived: "[${card_name}](https://trello.com/c/${card_link})"`
       }
     }
 
     else if (request.content.action.type == "commentCard") {
       var data = request.content.action.data;
-      message_text = '**New comment on card "[' + card_name + '](https://trello.com/c/' + card_link + ')" by ' + author_name + '**'
-      attachment_text += "-----------------------------------------------------------\n" + data.text
+      message_text = `**New comment on card "[${card_name}](https://trello.com/c/${card_link})" by ${author_name}**`
+      attachment_text += `-----------------------------------------------------------\n${data.text}`
     }
 
     else if (request.content.action.type == "moveCardFromBoard") {
       var data = request.content.action.data;
       var board_target_name = data.boardTarget.name;
 
-      message_text = 'Card moved: "[' + card_name + '](https://trello.com/c/' + card_link + ')" moved from "[' + board_name + '](https://trello.com/b/' + board_link + ') to board "' + board_target_name + '"'
+      message_text = `Card moved: "[${card_name}](https://trello.com/c/${card_link})" moved from "[${board_name}](https://trello.com/b/${board_link}) to board "${board_target_name}"`
 
     }
     else if (request.content.action.type == "moveCardToBoard") {
       var data = request.content.action.data;
       var board_source_name = data.boardSource.name;
 
-      message_text = 'Card moved: "[' + card_name + '](https://trello.com/c/' + card_link + ')" moved to "[' + board_name + '](https://trello.com/b/' + board_link + ') from board  "' + board_source_name + '"'
+      message_text = `Card moved: "[${card_name}](https://trello.com/c/${card_link})" moved to "[${board_name}](https://trello.com/b/${board_link}) from board  "${board_source_name}"`
     }
     else if (request.content.action.type == "addMemberToCard") {
       var data = request.content.action.data;
       var member = request.content.action.member.fullName;
       var member_url = request.content.action.member.username
 
-      message_text = 'New member [' + member + '](https://trello.com/' + member_url + ') added to card "[' + card_name + '](https://trello.com/c/' + card_link + ')"'
+      message_text = `New member [${member}](https://trello.com/${member_url}) added to card "[${card_name}](https://trello.com/c/${card_link})"`
     }
 
     else if (request.content.action.type == "removeMemberFromCard") {
@@ -163,7 +163,7 @@ class Script {
       var member = request.content.action.member.fullName;
       var member_url = request.content.action.member.username
 
-      message_text = 'Member [' + member + '](https://trello.com/' + member_url + ') is removed from card "[' + card_name + '](https://trello.com/c/' + card_link + ')"'
+      message_text = `Member [${member}](https://trello.com/${member_url}) is removed from card "[${card_name}](https://trello.com/c/${card_link})"`
     }
 
     else if (request.content.action.type == "addAttachmentToCard") {
@@ -171,7 +171,7 @@ class Script {
       var attachment_name = data.attachment.name;
       var attachment_url = data.attachment.url
 
-      message_text = 'New attachment added to card "[' + card_name + '](https://trello.com/c/' + card_link + ')"\n **[' + attachment_name + '](' + attachment_url + ')**'
+      message_text = `New attachment added to card "[${card_name}](https://trello.com/c/${card_link})"\n**[${attachment_name}](${attachment_url})**`
     }
 
     if (url == undefined || message_text == author_name) return;
@@ -183,7 +183,7 @@ class Script {
       content: {
         alias: author_name,
         icon_url: user_avatar,
-        text: $`[${request.content.model.name}](${request.content.model.shortUrl})\n${message_text}\n${attachment_text}`
+        text: `[${request.content.model.name}](${request.content.model.shortUrl})\n${message_text}\n${attachment_text}`
       }
     };
   }
